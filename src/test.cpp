@@ -7,7 +7,16 @@
 #include <sys/ioctl.h>
 #include <time.h>
 #include <csignal>
+#include <vector>
 
+// for sleep - fps
+#include <thread>
+#include <chrono>
+#include <string>
+
+// for system();
+#include <signal.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -21,12 +30,12 @@ private:
 	termios_p mOldTermP {&mOldTerm};
 	termios_p mNewTermP {&mNewTerm};
 	winsize mSize {};
-	bool helper {};
+	
 public:
-
-	Term(const termios term)
+	Term() = default;
+	Term(termios term, winsize termSize)
 		: mOldTerm {term}, mNewTerm {mOldTerm},
-		  helper {ioctl(STDIN_FILENO, TIOCGWINSZ, &mSize)}
+		  mSize {termSize}
 	{
 		
 	}
@@ -36,6 +45,20 @@ public:
 		// Sending Symbol without USING ENTER | ECHO OFF.
 		mNewTermP->c_lflag &= ~(ICANON | ECHO);	
 		tcsetattr(STDIN_FILENO, TCSANOW, mNewTermP);
+	}
+
+	void set_background()
+	{	
+		printf("\e[47m");
+		// for (int i = 5; i <= mSize.ws_row; ++i)
+		// {	
+		// 	for (int j = 1; j <= mSize.ws_row; ++j)
+		// 	{
+		// 		std::cout << "\e[" << i << ';'
+		// 		          << j     << 'H';
+		// 	}
+		// }
+
 	}
 
 	void cursor_visibility(bool mode=1)
@@ -66,7 +89,7 @@ public:
 	friend std::ostream& operator<< (std::ostream& out, const Term& term);
 };
 
-std::ostream& operator<< (std::ostream& out, const Term& term)
+std::ostream& operator << (std::ostream& out, const Term& term)
 {
 	out << "\nRows: " << term.mSize.ws_row << "\nCols: " << term.mSize.ws_col << '\n'; 
 	return out;
@@ -76,10 +99,8 @@ class Dino
 {
 private:
 	std::pair<int, int> mPos {1, 1};
-	
-
 public:
-
+	Dino() = default;
 	Dino(const std::pair<int, int>& pos)
 		: mPos {pos}
 	{}
@@ -90,11 +111,18 @@ public:
 	void render(std::pair<int, int> pos)
 	{
 		
-		printf("\e[%d;%dH", pos.first, pos.second);
-		cout << '@';
+		printf("\e[40m");
+		for (int i = 0; i < 4; ++i)
+		{
+			printf("\e[%d;%dH", pos.first, pos.second + i);
+			cout << ' ';
+		}
+		printf("\e[47m");
+		std::flush(std::cout);
+		mPos = pos;
 	}
 	
-	std::pair<int, int> getPos()
+	std::pair<int, int> getPos() const
 	{
 		return mPos;
 	}
@@ -102,58 +130,90 @@ public:
 	void setPos(std::pair<int, int> pos) { mPos = pos; }
 };
 
-
-int main()
-{	
+class Game
+{
+private:
+	Dino mDino {{5, 1}};
+	Term mTty {};
+	bool mRunning {1};
 	
+	
+	
+public:
+	Game() = default;
+	Game(termios term, winsize termSize)
+	:	mTty {term, termSize}
+	{}
+	
+	char get_key()
+	{
+		// std::string line;
+		// std::getline(std::cin, line);
+		// for (int i = 0; i < line.size(); ++i)
+		// {
+		// 	if (line[i] == 'a') return 'a';
+		// 	if (line[i] == 'd') return 'd';
+		// 	if (line[i] == 'w') return 'w';
+		// 	if (line[i] == 's') return 's';
+		// }
+		char key = 0;
+		cin >> key;
+		return key;
+	}
+
+	void init_term()
+	{
+		mTty.set_tty();
+		mTty.cursor_visibility(0);
+		mTty.set_background();
+		mTty.clear();
+	}
+
+	void play()
+	{	
+		init_term();
+		char key = 0;
+		while (mRunning)
+		{	
+			
+			key = get_key();
+			mTty.clear();
+			pair<int, int> pos = mDino.getPos();
+			switch (key)
+			{
+				case 'd':
+					pos.second = min((int) mTty.size().ws_col, pos.second + 1);
+					break;
+				case 'a':
+					pos.second = max(1, pos.second - 1);
+					break;
+				case 'w':
+					pos.first = max(1, pos.first - 1);
+					break;
+				case 's':
+					pos.first = min((int) mTty.size().ws_row, pos.first + 1);
+					break;
+			}
+			mDino.render(pos);
+			
+			// time
+			std::this_thread::sleep_for(std::chrono::nanoseconds(16666666));
+		}
+		mTty.reset();
+		cout << "END\n";
+	}
+};
+
+
+int main(int argc, char** argv)
+{		
+
 	termios term;
 	tcgetattr(STDIN_FILENO, &term);
-	Term tty {term};
-	tty.clear();
-	tty.set_tty();
-	tty.cursor_visibility(0);
-	
-	bool running = true;
-	char key = '0';
-	
-	timespec req = {};
-	timespec rem = {};
-	
-	winsize term_size = tty.size();
-	Dino dino {std::pair<int, int> {term_size.ws_row / 2, 1}};
-	while (running)
-	{	
-		cin >> key;
-		tty.clear();
-		std::pair<int, int> pos = dino.getPos();
-		if (key == 'd')
-		{	
-			pos.second = min((int) tty.size().ws_col, pos.second + 1);
-			
-		}
-		if (key == 'a')
-		{
-			pos.second = max(1, pos.second - 1);
-		}
-		if (key == 'w')
-		{
-			pos.first = max(1, pos.first - 1);
-		}
-		if (key == 's')
-		{
-			pos.first = min((int) tty.size().ws_row, pos.first + 1);
-		}
-		dino.setPos(pos);
-		dino.render(pos);
-		std::flush(cout);
-		req.tv_nsec = 0.1 * 1000000000;
-		nanosleep(&req, &rem);
-		
-		
-		
-	}
-	tty.reset();
-	cout << tty << '\n';
+	winsize size;
+	ioctl(STDIN_FILENO, TIOCGWINSZ, &size);
+	Game game {term, size};
+	game.play();
 	cout << "\e[32mHell oworld\e[m\n";
 	return 0;
 
