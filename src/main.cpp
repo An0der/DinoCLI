@@ -18,82 +18,65 @@
 #include <signal.h>
 #include <stdlib.h>
 
+#include "Term.h"
+
 using namespace std;
 
 
-class Term
-{
-using termios_p = termios*;
-private:
-	termios mOldTerm {};
-	termios mNewTerm {};
-	termios_p mOldTermP {&mOldTerm};
-	termios_p mNewTermP {&mNewTerm};
-	winsize mSize {};
+// class Term
+// {
+// using termios_p = termios*;
+// private:
+// 	termios mOldTerm {};
+// 	termios mNewTerm {};
+// 	termios_p mOldTermP {&mOldTerm};
+// 	termios_p mNewTermP {&mNewTerm};
+// 	winsize mSize {};
 	
-public:
-	Term() = default;
-	Term(termios term, winsize termSize)
-		: mOldTerm {term}, mNewTerm {mOldTerm},
-		  mSize {termSize}
-	{
+// public:
+// 	Term() = default;
+// 	Term(termios term, winsize termSize)
+// 		: mOldTerm {term}, mNewTerm {mOldTerm},
+// 		  mSize {termSize}
+// 	{
 		
-	}
+// 	}
 	
-	void set_tty()
-	{
-		// Sending Symbol without USING ENTER | ECHO OFF.
-		mNewTermP->c_lflag &= ~(ICANON | ECHO);	
-		tcsetattr(STDIN_FILENO, TCSANOW, mNewTermP);
-	}
+// 	void set_tty()
+// 	{
+// 		// Sending Symbol without USING ENTER | ECHO OFF.
+// 		mNewTermP->c_lflag &= ~(ICANON | ECHO);	
+// 		tcsetattr(STDIN_FILENO, TCSANOW, mNewTermP);
+// 	}
 
-	void set_background()
-	{	
-		printf("\e[47m");
-		// for (int i = 5; i <= mSize.ws_row; ++i)
-		// {	
-		// 	for (int j = 1; j <= mSize.ws_row; ++j)
-		// 	{
-		// 		std::cout << "\e[" << i << ';'
-		// 		          << j     << 'H';
-		// 	}
-		// }
+// 	void set_background()
+// 	{	
+// 		printf("\x1b[47m");
+// 	}
 
-	}
+// 	void cursor_visibility(bool mode=1)
+// 	{	
+// 		if (mode)
+// 			printf("\x1b[?25h");
+// 		else
+// 			printf("\x1b[?25l");
+// 	}
 
-	void cursor_visibility(bool mode=1)
-	{	
-		if (mode)
-			printf("\e[?25h");
-		else
-			printf("\e[?25l");
-	}
+// 	void clear()
+// 	{
+// 		printf("\x1b[2J");
+// 	}
 
-	void set_color();
+// 	void reset()
+// 	{	
+// 		printf("x\1b[m");
+// 		tcsetattr(STDIN_FILENO, TCSANOW, mOldTermP);
+// 		cursor_visibility(1);
+// 	}
 
-	void clear()
-	{
-		printf("\e[2J");
-	}
+// 	winsize get_size() { return mSize; }
+// };
 
-	void reset()
-	{	
-		printf("x\1b[m");
-		tcsetattr(STDIN_FILENO, TCSANOW, mOldTermP);
-		cursor_visibility(1);
-	}
-
-	winsize size() { return mSize; }
-	
-
-	friend std::ostream& operator<< (std::ostream& out, const Term& term);
-};
-
-std::ostream& operator << (std::ostream& out, const Term& term)
-{
-	out << "\nRows: " << term.mSize.ws_row << "\nCols: " << term.mSize.ws_col << '\n'; 
-	return out;
-}
 
 class Dino
 {
@@ -111,13 +94,13 @@ public:
 	void render(std::pair<int, int> pos)
 	{
 		
-		printf("\e[40m");
+		printf("\x1b[40m");
 		for (int i = 0; i < 4; ++i)
 		{
-			printf("\e[%d;%dH", pos.first, pos.second + i);
+			printf("\x1b[%d;%dH", pos.first, pos.second + i);
 			cout << ' ';
 		}
-		printf("\e[47m");
+		printf("\x1b[47m");
 		std::flush(std::cout);
 		mPos = pos;
 	}
@@ -182,7 +165,7 @@ public:
 			switch (key)
 			{
 				case 'd':
-					pos.second = min((int) mTty.size().ws_col, pos.second + 1);
+					pos.second = min((int) mTty.get_size().ws_col, pos.second + 1);
 					break;
 				case 'a':
 					pos.second = max(1, pos.second - 1);
@@ -191,7 +174,7 @@ public:
 					pos.first = max(1, pos.first - 1);
 					break;
 				case 's':
-					pos.first = min((int) mTty.size().ws_row, pos.first + 1);
+					pos.first = min((int) mTty.get_size().ws_row, pos.first + 1);
 					break;
 			}
 			mDino.render(pos);
@@ -214,9 +197,7 @@ int main(int argc, char** argv)
 	ioctl(STDIN_FILENO, TIOCGWINSZ, &size);
 	Game game {term, size};
 	game.play();
-	cout << "\e[32mHell oworld\e[m\n";
+	cout << "\x1b[32mHell oworld\x1b[m\n";
 	return 0;
 
 }
-
-
