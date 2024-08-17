@@ -22,62 +22,6 @@
 
 using namespace std;
 
-
-// class Term
-// {
-// using termios_p = termios*;
-// private:
-// 	termios mOldTerm {};
-// 	termios mNewTerm {};
-// 	termios_p mOldTermP {&mOldTerm};
-// 	termios_p mNewTermP {&mNewTerm};
-// 	winsize mSize {};
-	
-// public:
-// 	Term() = default;
-// 	Term(termios term, winsize termSize)
-// 		: mOldTerm {term}, mNewTerm {mOldTerm},
-// 		  mSize {termSize}
-// 	{
-		
-// 	}
-	
-// 	void set_tty()
-// 	{
-// 		// Sending Symbol without USING ENTER | ECHO OFF.
-// 		mNewTermP->c_lflag &= ~(ICANON | ECHO);	
-// 		tcsetattr(STDIN_FILENO, TCSANOW, mNewTermP);
-// 	}
-
-// 	void set_background()
-// 	{	
-// 		printf("\x1b[47m");
-// 	}
-
-// 	void cursor_visibility(bool mode=1)
-// 	{	
-// 		if (mode)
-// 			printf("\x1b[?25h");
-// 		else
-// 			printf("\x1b[?25l");
-// 	}
-
-// 	void clear()
-// 	{
-// 		printf("\x1b[2J");
-// 	}
-
-// 	void reset()
-// 	{	
-// 		printf("x\1b[m");
-// 		tcsetattr(STDIN_FILENO, TCSANOW, mOldTermP);
-// 		cursor_visibility(1);
-// 	}
-
-// 	winsize get_size() { return mSize; }
-// };
-
-
 class Dino
 {
 private:

@@ -14,8 +14,8 @@
 #include <iostream>
 
 Term::Term(termios term, winsize termSize)
-		: mOldTerm {term}, mNewTerm {mOldTerm},
-		  mSize {termSize}
+    : mOldTerm {term}, mNewTerm {mOldTerm},
+      mSize {termSize}
 {
 
 }
