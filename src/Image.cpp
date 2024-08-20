@@ -1,13 +1,20 @@
-#include "Image.h"
-#include <string>
 #include <iostream>
-#include <ifstream>
+#include <algorithm> // std::max()
+#include <fstream>
 
 
-Image::Image(std::string fileName)
-    : mFileName {fileName}
+#include "Image.h"
+
+std::pair<int, int> getMaxLegthHeight(const Image& image)
+{
+    
+}
+
+Image::Image(std::string_view relPathToDir, std::string_view fileName)
+    :mRelPathToDir {relPathToDir}, mFileName {fileName}
 {   
     parseImage();
+    setMaxLengthHeight();
 }
 
 const std::map<std::string, std::vector<std::string> >& 
@@ -28,7 +35,7 @@ void Image::checkFile(const std::ifstream& file) const
 
 void Image::parseImage()
 {   
-    std::ifstream img_file(mPathToImage + mFileName);
+    std::ifstream img_file(mRelPathToDir + mFileName);
     checkFile(img_file);
     std::string line {};
     while (std::getline(img_file, line))
@@ -47,3 +54,29 @@ void Image::parseImage()
     }
     img_file.close();
 }
+
+int Image::getHeight() const { return mHeight; }
+
+
+int Image::getLength() const { return mLength; }
+
+
+void Image::setLength(int length) { mLength = length; }
+
+
+void Image::setHeight(int height) { mHeight = height; }
+
+
+void Image::setMaxLengthHeight()
+{
+    int maxLineLength = 0;
+    int height = 0;
+    for (auto& line : mImageLines)
+    {
+        maxLineLength = std::max(static_cast<int>(mImageLines[line.first].size()), maxLineLength);
+        ++height;
+    }
+    setHeight(height);
+    setLength(maxLineLength);
+}
+
