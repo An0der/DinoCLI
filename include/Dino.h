@@ -1,27 +1,25 @@
 #pragma once
 
-#include <utility> // for std::pair
-#include "Rect.h"
+#include "Character.h"
 
-class Dino : public Rect
+
+/*
+Define render() & move() from base class
+*/
+class Dino : public Character
 {
 public:
-    Dino() = default;
-    Dino(std::pair<int, int>);
-    void render();
-    std::pair<int, int> getPos() const;
-    void setPos(std::pair<int, int>);
-    void render_basic();
-    void render_run_L();
-    void render_run_R();
-    void render_low();
-    void render();
-    struct Image
-    {
+    Dino(int left, int top, 
+         std::string_view relPathToDir, std::string_view fileName
+         );
 
-    };
-private:
-    std::pair<int, int> mPos {}; // position of leftmost character
+    void render();
 
-    int mState = 0; // basic = 0, run = 1, jump = 2, low = 3;
-};
+    void move(int moveX, int moveY);
+    // after this we use tty to change the cursor to this->getX() & this->getY()
+    // and then use render()
+
+    void jump();
+
+    void changeState();
+}

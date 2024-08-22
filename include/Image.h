@@ -18,20 +18,19 @@ public:
     virtual ~Image() = default;
 
     // To gather info from textfiles located in relPathToDir
-    std::map<std::string, std::vector<std::string> > parseImage() const;
+    std::map<int, std::vector<std::string> > parseImage() const;
     // Ref to ImageLines
-    const std::map<std::string, std::vector<std::string> >& getImageLines() const;     
+    const std::map<int, std::vector<std::string> >& getImageLines() const;     
     // Checks wheather file is opened correctly or not
     void checkFile(const std::ifstream& file) const;
-
-    // inits mHeight with maximum gotten image's line width to use in Rect.
-    // int initHeight() const;
-
-    // // inits mwidth
-    // int initWidth() const;
     
+    int getState() const;
+
+    void setState(int state);
 private:
     std::string mRelPathToDir {};
     std::string mFileName {};
-    std::map<std::string, std::vector<std::string> > mImageLines;
+    // could use just int instead of string key.
+    std::map<int, std::vector<std::string> > mImageLines; 
+    int mState {};
 };
