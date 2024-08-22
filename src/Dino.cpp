@@ -1,60 +1,55 @@
 #include <iostream>
+
 #include "Dino.h"
 
 
-Dino::Dino(std::pair<int, int> pos)
-    : mPos {pos}
+
+Dino::Dino(int left, int top,
+           std::string_view relPathToDir, std::string_view fileName,
+           float velocity
+           )
+    : Character(left, top, relPathToDir, fileName, velocity)
 {
 
 }
 
-void Dino::render_basic()
+void Dino::setPos(this->getLeft() + moveX, this->getTop() + moveY)
 {
-    std::cout << "      ___" << std::endl;
-    std::cout << "     |o__|" << std::endl;
-    std::cout << "     /##/" << std::endl;
-    std::cout << "\\_/###/" << std::endl;
-    // std::cout << "   #_ #_" << std::endl;
+    setPos(this->getLeft() + moveX, this->getTop() + moveY);
 }
 
-void Dino::render_run_L()
-{
-    // std::cout << "      ___" << std::endl;
-    // std::cout << "     |o__|" << std::endl;
-    // std::cout << "     /##/" << std::endl;
-    // std::cout << "\\_/###/" << std::endl;
-    std::cout << "   #  #_";
-    std::cout << "   #_" << std::endl;
-}
 
-void Dino::render_run_R()
-{
-    // std::cout << "      ___" << std::endl;
-    // std::cout << "     |o__|" << std::endl;
-    // std::cout << "     /##/" << std::endl;
-    // std::cout << "\\_/###/" << std::endl;
-    std::cout << "   #_ #";
-    std::cout << "      #_" << std::endl;
-}
-
-void Dino::render(int dinoColor)
-{
-		
-    std::cout << "\x1b[40m";
-    switch (mState)
+void Dino::render()
+{   
+    std::vector<std::string> > image;
+    swich(mState)
     {
         case 1:
-            render_run_L();
-            render_run_R();
-            break;
-        case 2:
-            render_low();
-            break;
-        default:
-            render_basic();
-    }
+        image = 
 
+    }
+}
+
+std::string chooseImage()
+{
     
-    std::cout << "\x1b[47m";
-    std::flush(std::cout);
+}
+
+void Dino::changState()
+{
+    switch (getState())
+    {
+    case 1:
+        setState(2);
+        break;
+    case 2:
+        setState(1);
+        break;
+    case 3:
+        setState(4);
+        break;
+    case 4:
+        setState(3);
+        break;
+    }
 }

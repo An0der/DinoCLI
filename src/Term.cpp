@@ -20,19 +20,19 @@ Term::Term(termios term, winsize termSize)
 
 }
 
-void Term::set_tty()
+void Term::setTty()
 {
     // Sending Symbol without USING ENTER | ECHO OFF.
     mNewTermP->c_lflag &= ~(ICANON | ECHO);	
     tcsetattr(STDIN_FILENO, TCSANOW, mNewTermP);
 }
 
-void Term::set_background()
+void Term::setBackground()
 {
     std::cout << "\x1b[47m";
 }
 
-void Term::cursor_visibility(bool mode)
+void Term::cursorVisibility(bool mode)
 {
     if (mode)
         printf("\x1b[?25h");
@@ -49,7 +49,12 @@ void Term::reset()
 {	
     printf("x\1b[m");
     tcsetattr(STDIN_FILENO, TCSANOW, mOldTermP);
-    cursor_visibility(1);
+    cursorVisibility(1);
 }
 
-winsize Term::get_size() { return mSize; }
+winsize Term::getSize() { return mSize; }
+
+void Term::moveCursorTo(int x, int y)
+{
+    std::cout << "\x1b[" << x << ';' << y << 'H';
+}
