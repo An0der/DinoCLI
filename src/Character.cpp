@@ -1,24 +1,44 @@
 #include "Character.h"
 
 
-Character::Character(std::string_view fileName, std::pair<int, int> initPos)
-    : Rect{initPos}, Image{fileName}
+Character::Character(
+                     int left, int top,
+                     std::string_view relPathToDir, std::string_view fileName
+                     )
+    :   Image(relPathToDir, fileName), Rect (left, top, initWidth(), initHeight())
 {
-    // set Rect parameters from input Image
+    
 }
 
 
+// the most easy checker which checks whether this collides with
+// object via right edge of rectangle
 bool Character::isCollidedWith(const Character& object)
 {
-    if (this->mRight <= object.mLeft)
+    if (this->getRight() >= object.getRight() / 2)
     {
-        return 0;
+        return 1;
     }
-    if (this->mBottom <= object.mLeft)
-    {
-        return 0;
-    }
+    return 0;
     
+}
+
+// Inits rect width with using Image::mImageLines
+int Character::initWidth() const
+{
+    int maxLineWidth = 0;
+    const std::map<std::string, std::vector<std::string> >& mImageLines = getImageLines();
+    for (const auto& line : mImageLines)
+    {
+        maxLineWidth = std::max(static_cast<int>(line.second.size()), maxLineWidth);
+    }
+    return maxLineWidth;
+}
+// Inits rect height using Image::mImageLines
+int Character::initHeight() const 
+{   
+    const std::map<std::string, std::vector<std::string> >& mImageLines = getImageLines();
+    return mImageLines.size(); 
 }
 
 
