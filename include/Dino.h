@@ -10,7 +10,8 @@ class Dino : public Character
 {
 public:
     Dino(int left, int top, 
-         std::string_view relPathToDir, std::string_view fileName
+         std::string_view relPathToDir, std::string_view fileName,
+         float velocity=1
          );
 
     void render();
@@ -22,4 +23,12 @@ public:
     void jump();
 
     void changeState();
-}
+
+    void move() override;
+
+    void run();
+
+    void duckRun();
+
+    void printLines() const;
+};

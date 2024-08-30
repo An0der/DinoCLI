@@ -14,12 +14,6 @@ Image::Image(std::string_view relPathToDir, std::string_view fileName)
 }
 
 
-const std::map<int, std::vector<std::string> >&
-Image::getImageLines() const
-{   
-    return mImageLines;
-}
-
 void Image::checkFile(const std::ifstream& file) const
 {
     
@@ -61,9 +55,3 @@ int Image::getState() const { return mState; }
 
 void Image::setState(int state) { mState = state; }
 
-
-int main()
-{
-    Image img {"../Characters/", "Dino"};
-   
-}
