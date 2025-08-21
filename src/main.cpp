@@ -1,9 +1,14 @@
 #include <iostream>
-
+#include <ncurses.h>
 
 int main()
 {
     std::cout << "HEllo world" << std::endl;
-
+    initscr();			/* Start curses mode 		  */
+	printw("Hello World !!!");	/* Print Hello World		  */
+	refresh();			/* Print it on to the real screen */
+	getch();			/* Wait for user input */
+	endwin();	
+    
     return 0;
 }
