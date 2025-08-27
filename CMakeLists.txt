@@ -1,7 +1,7 @@
 
-cmake_minimum_required(VERSION "3.10")
+cmake_minimum_required(VERSION 3.10)
 
-project(DinoCLI CXX)
+project(DinoCLI LANGUAGES CXX)
 
 set(CXX_STANDARD 17)
 
